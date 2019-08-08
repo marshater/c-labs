@@ -21,7 +21,6 @@
  * 
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -41,6 +40,11 @@ int main(int argc, char **argv)
 	for (int i = 0; i < num; i++)
 	{
 		var[i]=(struct str*)malloc(sizeof(struct str));
+			if (NULL == var[i])
+			{
+			printf("<%s> %d: calloc failed\n", __FUNCTION__, __LINE__);
+			return -1;
+			}
 		printf("Введите год\n");
 		scanf("%i", &var[i]->year);
 		printf("Введите цену\n");
@@ -57,8 +61,8 @@ int main(int argc, char **argv)
 		printf("%d\n", var[i]->price);
 		printf("Количество\n");
 		printf("%d\n", var[i]->number);
+		free(var[i]);
 	}
 
 }
-
 
