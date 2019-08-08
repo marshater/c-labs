@@ -13,22 +13,27 @@ int main(int argc, char **argv)
 	buff_array = calloc(num_lines, sizeof(char*));
 	string_array = calloc(num_lines, sizeof(char*));
 	if (NULL == string_array)
-	{
+		{
 		printf("error \n");
 		return -1;
-	}
+		}
 		for (int i = 0; i < num_lines; i++)
-	{
+		{
 		string_array[i] = calloc(1, MAX_LEN);
 		buff_array[i] = calloc(1, MAX_LEN);
-		if (NULL == string_array[i])
-		{
+			if (NULL == string_array[i])
+			{
 			printf("<%s> %d: calloc failed\n", __FUNCTION__, __LINE__);
 			return -1;
-		}
+			}
+				if (NULL == buff_array[i])
+				{
+				printf("<%s> %d: calloc failed\n", __FUNCTION__, __LINE__);
+				return -1;
+				}
 		gets(string_array[i]);
 		strcpy(buff_array[i],string_array[i]);
-	}
+		}
 	
 	int sorting(const void * x, const void * y)
 	{
@@ -55,11 +60,10 @@ int main(int argc, char **argv)
 	for (int i = 0; i < num_lines; i++)
 	{
 		free(string_array[i]);
-		string_array[i] = NULL;
+		free(buff_array[i]);
 	}
 	free(buff_array);
 	free(string_array);
 
 	return 0;
 }
-
