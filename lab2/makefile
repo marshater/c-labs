@@ -1,5 +1,5 @@
 all: main
 main:
-	gcc lab2.c -o lab2 < Strings.txt
+	gcc lab2.c -o lab2 
 clean:
-	rm-rf ./lab2
+	rm ./lab2
