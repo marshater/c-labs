@@ -1,0 +1,2 @@
+doit: lab51.o math.a
+	gcc lab51.o -L. -lmath -o test
