@@ -4,16 +4,20 @@ int main(int argc, char *argv[])
 {
 	FILE *fp;
 	FILE *stream;
-	fp = fopen(argv[1], "a");
+	printf(argv[1],"first\n");
+	printf(argv[2],"second\n");
+	printf(argv[3],"third\n");
+	fp = fopen(argv[1], "r+");
 	stream = fopen("doub", "w");
-char ch;
-while((ch=fgetc(fp)) != EOF){
-	if (ch == '\n'){
-		fputc(ch, stream);
+char *ch;
+while ((*ch=fgetc(fp)) != EOF){
+	if (*ch == *argv[2]){
+		do{
+		fputc(*ch++, stream);
+		}while (*ch == '\n');
 		}
-	}
+}
 fclose(fp);
 fclose(stream);
 	return 0;
 }
-
