@@ -9,12 +9,13 @@ int main(int argc, char *argv[])
 	fp = fopen(argv[1], "r+");
 	stream = fopen("doub", "w");
 	char ch;
+	char *buff;
 while ((ch=fgetc(fp)) != EOF){
-	if (ch == *argv[2]){
+	buff = &ch;
 		do{
-		fputc(ch, stream);
-		}while (ch == '\n');
-		}
+			fputc(*buff++, stream);
+			}while (*buff == *argv[2]);
+
 }
 fclose(fp);
 fclose(stream);
