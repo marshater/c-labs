@@ -10,6 +10,10 @@ int main(int argc, char *argv[])
 	FILE *stream;
 	fp = fopen(argv[1], "r");
 	stream = fopen("editing", "w");
+	if((fp=fopen(argv[1], "r"))==NULL||(stream=fopen("editing", "w"))==NULL) {
+    	printf("Не удается открыть файл.\n");
+    	exit(1);
+	}
 	deleting(fp, stream, *argv[2]);
 	fclose(fp);
 	fclose(stream);
