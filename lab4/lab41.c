@@ -12,8 +12,6 @@ int main(int argc, char *argv[])
 
 	FILE *fp;
 	FILE *stream;
-	printf("%s\n", argv[1]);
-	printf("%i\n", atoi(argv[2]));
 	fp = fopen(argv[1], "r");
 	stream = fopen("editing", "w");
 	removing(fp, stream, atoi(argv[2]));
