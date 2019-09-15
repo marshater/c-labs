@@ -31,6 +31,7 @@ void removing(FILE *fp, FILE *stream, int num){
 			}
 			else if(count < num){
 				fputs(p, stream);
+				fputs("\n", stream);
 				count = 0;
 				memset(p, 0, sizeof(p));}else{
 				count = 0;
