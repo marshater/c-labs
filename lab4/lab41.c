@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define lim 100
+#DEFINE LIM 100
 
 void removing(FILE*, FILE*, int);
 int main(int argc, char *argv[])
@@ -14,6 +14,10 @@ int main(int argc, char *argv[])
 	FILE *stream;
 	fp = fopen(argv[1], "r");
 	stream = fopen("editing", "w");
+		if((fp=fopen(argv[1], "r"))==NULL||(stream=fopen("editing", "w"))==NULL) {
+    		printf("Не удается открыть файл.\n");
+    		exit(1);
+		}
 	removing(fp, stream, atoi(argv[2]));
 	fclose(fp);
 	fclose(stream);
@@ -23,7 +27,7 @@ void removing(FILE *fp, FILE *stream, int num){
 	char ch;
 	int count = 0;
 	char *p = NULL;
-	p = (char*)calloc(lim, sizeof(char));
+	p = (char*)calloc(LIM, sizeof(char));
 	while ((ch=fgetc(fp)) != EOF){
 		if(ch != '\n'){
 			p[count] = ch;
@@ -33,9 +37,10 @@ void removing(FILE *fp, FILE *stream, int num){
 				fputs(p, stream);
 				fputs("\n", stream);
 				count = 0;
-				memset(p, 0, sizeof(p));}else{
+				memset(p, 0, LIM);}
+			else{
 				count = 0;
-				memset(p, 0, sizeof(p));}
+				memset(p, 0, LIM);}
 			};
 			free (p);
 }
