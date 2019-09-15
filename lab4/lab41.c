@@ -23,7 +23,7 @@ void removing(FILE *fp, FILE *stream, int num){
 	char ch;
 	int count = 0;
 	char *p = NULL;
-	p = (char*)calloc(100, sizeof(char));
+	p = (char*)calloc(lim, sizeof(char));
 	while ((ch=fgetc(fp)) != EOF){
 		if(ch != '\n'){
 			p[count] = ch;
