@@ -49,17 +49,17 @@ int doit(int **A, int *B, int *M, int N) {
           printf("fork() failed\n");
           exit(-1);
         } else if (pid[i] == 0) {
-			close (fd[i][0]);
-			for(int i = 0; i < N; i++){
-			  for(int j = 0; j < N; j++){
-				int tmp = mult(A[j][i], B[j], N);
-                R = R + tmp;   
-		      }
-		      write(fd[i][1], &R, sizeof(int));
-		      printf("child: C[%d]=%d \t",i, R);
-		      R = 0;
-            }
-	      }
+	    close (fd[i][0]);
+	      for(int i = 0; i < N; i++){
+	        for(int j = 0; j < N; j++){
+	          int tmp = mult(A[j][i], B[j], N);
+                  R = R + tmp;   
+	        }
+		  write(fd[i][1], &R, sizeof(int));
+		  printf("child: C[%d]=%d \t",i, R);
+		  R = 0;
+              }
+	   }
 	  exit(0);
     }
   for(int i = 0; i < N; i++) {
