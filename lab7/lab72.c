@@ -73,10 +73,6 @@ int doit(int **A, int *B, int *M, int N) {
         }
     }
     return *M;
-    for(int i = 0; i < N; i++){
-	    close(fd[i][0]);
-		close(fd[i][1]);
-	}
 }
 
 void arrInit(int *** arr, int dim) {
