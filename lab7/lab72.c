@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <string.h>
-#define FIFO1 "/tmp/FIFO1"
+
 
 void arrInit(int *** arr, int dim);
 void arrFree(int ** arr, int dim);
@@ -40,9 +40,10 @@ int doit(int **A, int *B, int *M, int N) {
     pid_t pid[N];
     int fd[N];
     int pfd[N];
-    mkfifo(FIFO1, 0666, 0);
+    int FIFO[N];
     for (int i = 0; i < N; i++) {
         pid[i] = fork();
+        mkfifo(FIFO[i], 0111);
         if (pid < 0) {
             printf("fork() failed\n");
             exit(-1);
@@ -52,7 +53,7 @@ int doit(int **A, int *B, int *M, int N) {
                     int tmp = mult(A[j][i], B[j], N);
                     R = R + tmp;
                 }
-                fd[i] = open(FIFO1, O_RDWR, 0);
+                fd[i] = open(FIFO[i], O_RDWR, 0);
                 write(fd[i], &R, sizeof(int));
                 close(fd[i]);
                 printf("child: C[%d]=%d \t",i, R);
@@ -63,7 +64,7 @@ int doit(int **A, int *B, int *M, int N) {
     }
         for(int i = 0; i < N; i++) {
             for (int i = 0; i < N; i++) {
-                pfd[i]=open(FIFO1, O_RDONLY, 0);
+                pfd[i]=open(FIFO[i], O_RDONLY, 0);
                 int res;
                 if (pid[i]==waitpid(pid[i], &status, 0)) {
                     read(pfd[i], &res, sizeof(int));
