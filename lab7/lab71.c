@@ -66,10 +66,13 @@ int doit(int **A, int *B, int *M, int N) {
 		close(fd[i][1]);
 		int buf;
     	pid[i] = waitpid(pid[i], &status, 0);
-    	read(fd[i][0], &buf, sizeof(int));
-    	M[i] = WEXITSTATUS(status);
+    	*M = read(fd[i][0], &buf, sizeof(int));
 	}
-	return 0;
+	return *M;
+	for(int i = 0; i < N; i++){
+		close(fd[i][0]);
+		close(fd[i][1]);
+	}
 }
 
 void arrInit(int *** arr, int dim) {
@@ -125,7 +128,7 @@ void VecPrint(int *arr, int dim) {
 }
 
 int main(int argc, char** argv) {
-	int **A, *B, *M, N;
+	int **A, *B, *M, N, out;
 	srand(time(NULL));
 	scanf("%d", &N);
 	if (N <= 0) return -1;
@@ -144,6 +147,7 @@ int main(int argc, char** argv) {
 	VecPrint(B, N);
 
 	doit(A, B, M, N);
+
 
 	printf("Arr M = A x B =\n");
 	VecPrint(M, N);
