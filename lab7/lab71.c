@@ -7,8 +7,8 @@
 #include <time.h>
 #include <stdint.h>
 
-void arrInit(int *** arr, int dim);
-void arrFree(int ** arr, int dim);
+void arrInit(int ***arr, int dim);
+void arrFree(int **arr, int dim);
 
 
 int mult(int A, int B, int N) {
@@ -63,7 +63,7 @@ int doit(int **A, int *B, int *M, int N) {
 	}
 	for(int i = 0; i < N; i++) {
 		int buf;
-    	pid[i] = waitpid(pid[i], &status, 0);
+    		pid[i] = waitpid(pid[i], &status, 0);
 		*M = read(fd[i][0], &buf, sizeof(int));
 	}
 	for(int i = 0; i < N; i++){
@@ -73,7 +73,7 @@ int doit(int **A, int *B, int *M, int N) {
 	return *M;
 }
 
-void arrInit(int *** arr, int dim) {
+void arrInit(int ***arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	int ** arrTmp = calloc(dim, sizeof(int*));
@@ -93,20 +93,20 @@ void vecInit(int **vec, int dim) {
 	*vec = vecTmp;
 }
 
-void arrFree(int ** arr, int dim) {
+void arrFree(int **arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	for (int i = 0; i < dim; ++i) free(arr[i]);
 	free(arr); 
 }
 
-void vecFree(int * arr, int dim) {
+void vecFree(int *arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	free(arr); 
 }
 
-void arrPrint(int ** arr, int dim) {
+void arrPrint(int **arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	for (int i = 0; i < dim; ++i) {
