@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,12 +27,11 @@ void arrFill(int **A, int N) {
         }
     }
 }
-void VecFill(int *B, int N) {
+void vecFill(int *B, int N) {
     for(int i = 0; i < N; i++) {
             B[i] = 1 + rand() % 5;
     }
 }
-
 
 
 int doit(int **A, int *B, int *M, int N) {
@@ -40,10 +40,10 @@ int doit(int **A, int *B, int *M, int N) {
     pid_t pid[N];
     int fd[N];
     int pfd[N];
-    int FIFO[N];
+    int fifo[N];
     for (int i = 0; i < N; i++) {
         pid[i] = fork();
-        mkfifo(FIFO[i], 0111);
+        mkfifo(fifo[i], 0111);
         if (pid < 0) {
             printf("fork() failed\n");
             exit(-1);
@@ -53,7 +53,7 @@ int doit(int **A, int *B, int *M, int N) {
                     int tmp = mult(A[j][i], B[j], N);
                     R = R + tmp;
                 }
-                fd[i] = open(FIFO[i], O_RDWR, 0);
+                fd[i] = open(fifo[i], O_RDWR, 0);
                 write(fd[i], &R, sizeof(int));
                 close(fd[i]);
                 printf("child: C[%d]=%d \t",i, R);
@@ -64,7 +64,7 @@ int doit(int **A, int *B, int *M, int N) {
     }
         for(int i = 0; i < N; i++) {
             for (int i = 0; i < N; i++) {
-                pfd[i]=open(FIFO[i], O_RDONLY, 0);
+                pfd[i]=open(fifo[i], O_RDONLY, 0);
                 int res;
                 if (pid[i]==waitpid(pid[i], &status, 0)) {
                     read(pfd[i], &res, sizeof(int));
@@ -88,11 +88,12 @@ void arrInit(int *** arr, int dim) {
   *arr = arrTmp;  
 }
 
-void VecInit(int * Vec, int dim) {
+void vecInit(int **vec, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
-    if (!Vec) return;
-    Vec = calloc(dim, sizeof(int*));
-    if (!Vec) return;
+    if (!vec) return;
+    int *vecTmp = calloc(dim, sizeof(int*));
+    if (!vec) return;
+    *vec = vecTmp;
 }
 
 void arrFree(int ** arr, int dim) {
@@ -102,7 +103,7 @@ void arrFree(int ** arr, int dim) {
     free(arr); 
 }
 
-void VecFree(int * arr, int dim) {
+void vecFree(int * arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
     free(arr); 
@@ -121,7 +122,7 @@ void arrPrint(int ** arr, int dim) {
 }
 
 
-void VecPrint(int *arr, int dim) {
+void vecPrint(int *arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
     for (int i = 0; i < dim; i++){
@@ -135,26 +136,28 @@ int main(int argc, char** argv) {
     srand(time(NULL));
     scanf("%d", &N);
     if (N <= 0) return -1;
-    B = calloc(N, sizeof(int*));
-    M = calloc(N, sizeof(int*));
+
 
     arrInit(&A, N);
+    vecInit(&B, N);
+    vecInit(&M, N);
 
     arrFill(A,N);
-    VecFill(B,N);
+    vecFill(B,N);
 
     printf("Arr A:\n");
     arrPrint(A, N);
 
     printf("Arr B:\n");
-    VecPrint(B, N);
+    vecPrint(B, N);
 
     doit(A, B, M, N);
     printf("Arr M = A x B =\n");
-    VecPrint(M, N);
+    vecPrint(M, N);
 
     arrFree(A, N);
-    free(B);
-    free(M);
-  return 0;
+    vecFree(B, N);
+    vecFree(M, N);
+
+    return 0;
 }
