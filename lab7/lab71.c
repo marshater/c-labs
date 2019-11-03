@@ -17,6 +17,7 @@ int mult(int A, int B, int N) {
 	return res;
 }
 
+
 void arrFill(int **A, int N) {
 	for(int i = 0; i < N; i++) {
 		for(int j = 0; j < N; j++) {
@@ -24,13 +25,12 @@ void arrFill(int **A, int N) {
 		}
 	}
 }
-void VecFill(int *B, int N) {
+
+void vecFill(int *B, int N) {
 	for(int i = 0; i < N; i++) {
 			B[i] = 1 + rand() % 5;
 	}
 }
-
-
 
 int doit(int **A, int *B, int *M, int N) {
     int status;
@@ -49,7 +49,6 @@ int doit(int **A, int *B, int *M, int N) {
         	printf("fork() failed\n");
         	exit(-1);
         } else if (pid[i] == 0) {
-	    close (fd[i][0]);
 	    	for(int i = 0; i < N; i++){
 	    		for(int j = 0; j < N; j++){
 	        		int tmp = mult(A[j][i], B[j], N);
@@ -63,16 +62,15 @@ int doit(int **A, int *B, int *M, int N) {
 		exit(0);
 	}
 	for(int i = 0; i < N; i++) {
-		close(fd[i][1]);
 		int buf;
     	pid[i] = waitpid(pid[i], &status, 0);
-    	*M = read(fd[i][0], &buf, sizeof(int));
+		*M = read(fd[i][0], &buf, sizeof(int));
 	}
-	return *M;
 	for(int i = 0; i < N; i++){
 		close(fd[i][0]);
 		close(fd[i][1]);
 	}
+	return *M;
 }
 
 void arrInit(int *** arr, int dim) {
@@ -86,11 +84,13 @@ void arrInit(int *** arr, int dim) {
 	}
 	*arr = arrTmp;  
 }
-void VecInit(int * Vec, int dim) {
+
+void vecInit(int **vec, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
-	if (!Vec) return;
-	Vec = calloc(dim, sizeof(int*));
-	if (!Vec) return;
+	if (!vec) return;
+	int *vecTmp = calloc(dim, sizeof(int*));
+	if (!vec) return;
+	*vec = vecTmp;
 }
 
 void arrFree(int ** arr, int dim) {
@@ -99,7 +99,8 @@ void arrFree(int ** arr, int dim) {
 	for (int i = 0; i < dim; ++i) free(arr[i]);
 	free(arr); 
 }
-void VecFree(int * arr, int dim) {
+
+void vecFree(int * arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	free(arr); 
@@ -118,7 +119,7 @@ void arrPrint(int ** arr, int dim) {
 }
 
 
-void VecPrint(int *arr, int dim) {
+void vecPrint(int *arr, int dim) {
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	for (int i = 0; i < dim; i++) {
@@ -132,28 +133,27 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
 	scanf("%d", &N);
 	if (N <= 0) return -1;
-	B = calloc(N, sizeof(int*));
-	M = calloc(N, sizeof(int*));
 
 	arrInit(&A, N);
+	vecInit(&B, N);
+	vecInit(&M, N);
 
 	arrFill(A,N);
-	VecFill(B,N);
+	vecFill(B,N);
 
 	printf("Arr A:\n");
 	arrPrint(A, N);
 
 	printf("Arr B:\n");
-	VecPrint(B, N);
+	vecPrint(B, N);
 
 	doit(A, B, M, N);
 
-
 	printf("Arr M = A x B =\n");
-	VecPrint(M, N);
+	vecPrint(M, N);
 
 	arrFree(A, N);
-	free(B);
-	free(M);
+	vecFree(B, N);
+	vecFree(M, N);
 	return 0;
 }
