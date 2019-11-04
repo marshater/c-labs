@@ -151,10 +151,8 @@ int main(int argc, char** argv) {
     if (N <= 0) return -1;
     int msqid = msgget(IPC_PRIVATE, 0600|IPC_CREAT);
 
-
     arrInit(&A, N);
     vecInit(&B, N);
-
 
     arrFill(A,N);
     vecFill(B,N);
@@ -166,13 +164,9 @@ int main(int argc, char** argv) {
     vecPrint(B, N);
 
     doit(A, B, N, msqid);
-    vecPrint(B, N);
-    printf("Arr M = A x B =\n");
-
 
     arrFree(A, N);
     vecFree(B, N);
-
 
     return 0;
 }
