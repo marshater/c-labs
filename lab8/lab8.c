@@ -48,7 +48,7 @@ void vecFill(int *B, int N) {
 }
 
 
-int doit(int **A, int *B, int *M, int N, int msqid) {
+void doit(int **A, int *B, int N, int msqid) {
     int status;
     int R = 0;
     pid_t pid[N];
@@ -60,7 +60,6 @@ int doit(int **A, int *B, int *M, int N, int msqid) {
 };
     for (int i = 0; i < N; i++) {
         pid[i] = fork();
-
         if (pid < 0) {
             printf("fork() failed\n");
             exit(-1);
@@ -87,7 +86,6 @@ int doit(int **A, int *B, int *M, int N, int msqid) {
                 }
         }
     }
-    return *M;
 }
 
 void arrInit(int *** arr, int dim) {
@@ -147,7 +145,7 @@ void vecPrint(int *arr, int dim) {
 }
 
 int main(int argc, char** argv) {
-    int **A, *B, *M, N;
+    int **A, *B, N;
     srand(time(NULL));
     scanf("%d", &N);
     if (N <= 0) return -1;
@@ -156,7 +154,7 @@ int main(int argc, char** argv) {
 
     arrInit(&A, N);
     vecInit(&B, N);
-    vecInit(&M, N);
+
 
     arrFill(A,N);
     vecFill(B,N);
@@ -167,14 +165,14 @@ int main(int argc, char** argv) {
     printf("Arr B:\n");
     vecPrint(B, N);
 
-    doit(A, B, M, N, msqid);
+    doit(A, B, N, msqid);
+    vecPrint(B, N);
     printf("Arr M = A x B =\n");
-    vecPrint(M, N);
+
 
     arrFree(A, N);
     vecFree(B, N);
-    vecFree(M, N);
+
 
     return 0;
 }
-
