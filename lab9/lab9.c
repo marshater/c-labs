@@ -62,8 +62,6 @@ void vecPrint(int *arr, int dim) {
 
 void doit(int **A, int *B, int N, int *shmem, int key ) {
 	pid_t pid[N];
-
-
 	for (int i = 0; i < N; i++) {
 		pid[i] = fork();
 
