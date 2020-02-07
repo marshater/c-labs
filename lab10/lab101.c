@@ -11,7 +11,7 @@
 void *MultMatrix(void*);
 
 #define MAX_SEND_SIZE 80
-typedef struct DATA Data;
+
 
 struct DATA{
     int **MainMatrix;
@@ -113,8 +113,9 @@ int main(int argc, char** argv) {
 
 
     arrInit(&A, N);
-    vecInit(&B, N);
     arrInit(&info.MainMatrix, N);
+    
+    vecInit(&B, N);
     vecInit(&info.SubMatrix, N);
 
 
@@ -132,27 +133,25 @@ int main(int argc, char** argv) {
 for(int i = 0; i < N; i++){
     for(int j = 0; j < N; j++){
         info.MainMatrix[i][j] = A[i][j];
-        //printf("test2\n");
-        //printf("%i\n", info.MainMatrix[i][j]);
     }
         info.SubMatrix[i] = B[i];
         info.Number = N;
 }
 // create threads
     for(int i = 0; i < N; i++){
-    if(pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
+        if(pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
         perror("Cant create");
         return EXIT_FAILURE;
-    }
+        }
     }
 //join threads
     for(int i = 0; i < N; i++){
         if((pthread_join(lines[i],(void**) &R)) != 0){
-        perror("Cant join");
-        return EXIT_FAILURE;
-    }else{
+            perror("Cant join");
+            return EXIT_FAILURE;
+        }else{
     printf("%i\n", (int) R);
-}
+        }
     }
 
     arrFree(A, N);
@@ -160,25 +159,21 @@ for(int i = 0; i < N; i++){
     arrFree(info.MainMatrix,N);
     vecFree(info.SubMatrix, N);
 
-
     return 0;
 }
     void *MultMatrix(void *arg){
     int Z = 0;
     int var;
     Data* info = (Data*) arg;
-    for(int i = 0; i < info->Number; i++){
-        sleep(1);
-        for(int j = 0; j < info->Number; j++){
-            //printf("test2\n");
-            //printf("%i\n", info->MainMatrix[j][i]);
-            int tmp = mult(info->MainMatrix[j][i], info->SubMatrix[j],info->Number);
-            //printf("%d\n", tmp);
-            Z = Z + tmp;
+        for(int i = 0; i < info->Number; i++){
+            sleep(1);
+            for(int j = 0; j < info->Number; j++){
+                int tmp = mult(info->MainMatrix[j][i], info->SubMatrix[j],info->Number);
+                Z = Z + tmp;
             }
-                printf("%i\n", Z);//передаем данные на вывод и обнуляем счетчик матрицы
-                var = Z;
-                Z = 0;
-            }
-            pthread_exit((void*)var);
+        printf("%i\n", Z);//передаем данные на вывод и обнуляем счетчик матрицы
+        var = Z;
+        Z = 0;
         }
+    pthread_exit((void*)var);
+    }
