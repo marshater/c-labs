@@ -13,8 +13,8 @@ void *MultMatrix(void*);
 #define MAX_SEND_SIZE 80
 
 
-struct DATA{
-    int **MainMatrix;
+struct DATA {
+    int *MainMatrix;
     int *SubMatrix;
     int Number;
 };
@@ -25,8 +25,8 @@ void arrFree(int ** arr, int dim);
 
 int mult(int A, int B, int N) {
     int res = 0;
-    res += A * B;
-    return res;
+    	res += A * B;
+    	return res;
 }
 
 void arrFill(int **A, int N) {
@@ -106,14 +106,18 @@ int main(int argc, char** argv) {
     srand(time(NULL));
     scanf("%d", &N);
     if (N <= 0) return -1;
-    int R;
+    int R[N];
     int res = 0;
     struct DATA info;
     pthread_t lines[N];
 
 
+    pthread_mutex_t mutex;
+    pthread_mutex_init(&mutex, NULL);
+
+
     arrInit(&A, N);
-    arrInit(&info.MainMatrix, N);
+    vecInit(&info.MainMatrix, N);
     
     vecInit(&B, N);
     vecInit(&info.SubMatrix, N);
@@ -131,49 +135,46 @@ int main(int argc, char** argv) {
 
 // пишем в структуру
 for(int i = 0; i < N; i++){
-    for(int j = 0; j < N; j++){
-        info.MainMatrix[i][j] = A[i][j];
-    }
-        info.SubMatrix[i] = B[i];
-        info.Number = N;
-}
-// create threads
-    for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+// грязный костыль для ввода построчно
+			info.SubMatrix[j] = B[j];
+        	info.Number = N;
+			info.MainMatrix[j] = A[j][i];
+		}
+// вы мутехи, да? Если мутехи, то идите найух:)
+        pthread_mutex_lock(&mutex);
         if(pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
-        perror("Cant create");
-        return EXIT_FAILURE;
+        	perror("Cant create");
+        	return EXIT_FAILURE;
+        }else{
+            pthread_mutex_unlock(&mutex);
         }
-    }
-//join threads
-    for(int i = 0; i < N; i++){
         if((pthread_join(lines[i],(void**) &R)) != 0){
             perror("Cant join");
             return EXIT_FAILURE;
         }else{
-    printf("%i\n", (int) R);
+    printf("%i\n", (int) *R);
         }
-    }
+}
+
+
+
+    pthread_mutex_destroy(&mutex);
 
     arrFree(A, N);
     vecFree(B, N);
-    arrFree(info.MainMatrix,N);
+    vecFree(info.MainMatrix,N);
     vecFree(info.SubMatrix, N);
 
     return 0;
 }
+
     void *MultMatrix(void *arg){
     int Z = 0;
-    int var;
-    Data* info = (Data*) arg;
+    struct DATA* info = (struct DATA*) arg;
         for(int i = 0; i < info->Number; i++){
-            sleep(1);
-            for(int j = 0; j < info->Number; j++){
-                int tmp = mult(info->MainMatrix[j][i], info->SubMatrix[j],info->Number);
-                Z = Z + tmp;
-            }
-        printf("%i\n", Z);//передаем данные на вывод и обнуляем счетчик матрицы
-        var = Z;
-        Z = 0;
-        }
-    pthread_exit((void*)var);
+            int tmp = mult(info->MainMatrix[i], info->SubMatrix[i],info->Number);
+            Z = Z + tmp;
+    }
+    pthread_exit((void*) Z);
     }
