@@ -4,19 +4,17 @@
 #DEFINE LIM 100
 
 void removing(FILE*, FILE*, int);
-int main(int argc, char *argv[])
-{
-	  if (argc < 2){
+int main(int argc, char *argv[]){
+	if (argc < 2){
 	fprintf (stderr, "Мало аргументов. Используйте <имя файла> <удаляемый символ>\n");
-}
-
+	}
 	FILE *fp;
 	FILE *stream;
 	fp = fopen(argv[1], "r");
 	stream = fopen("editing", "w");
 		if((fp=fopen(argv[1], "r"))==NULL||(stream=fopen("editing", "w"))==NULL) {
-    		printf("Не удается открыть файл.\n");
-    		exit(1);
+    			printf("Не удается открыть файл.\n");
+    			exit(1);
 		}
 	removing(fp, stream, atoi(argv[2]));
 	fclose(fp);
@@ -32,7 +30,7 @@ void removing(FILE *fp, FILE *stream, int num){
 		if(ch != '\n'){
 			p[count] = ch;
 			count++;
-			}
+		}
 			else if(count < num){
 				fputs(p, stream);
 				fputs("\n", stream);
