@@ -10,22 +10,22 @@ void arrInit(int *** arr, int dim);
 void arrFree(int ** arr, int dim);
 
 int mult(int A, int B, int N) {
-	int res = 0;
+    int res = 0;
     res += A * B;
-  return res;
-  
+	return res;
 }
 
 void arrFill(int **A, int N) {
 	for(int i = 0; i < N; i++) {
 		for(int j = 0; j < N; j++) {
-			A[i][j] = 1 + rand() % 5;
+		    A[i][j] = 1 + rand() % 5;
 		}
 	}
 }
+
 void VecFill(int *B, int N) {
 	for(int i = 0; i < N; i++) {
-			B[i] = 1 + rand() % 5;
+		B[i] = 1 + rand() % 5;
 	}
 }
 
@@ -37,24 +37,24 @@ int doit(int **A, int *B, int *M, int N) {
     for (int i = 0; i < N; i++) {
         pid[i] = fork();
         if (pid < 0) {
-          printf("fork() failed\n");
-          exit(-1);
+        	printf("fork() failed\n");
+        	exit(-1);
         } else if (pid[i] == 0) {
 			for(int i = 0; i < N; i++){
-			  for(int j = 0; j < N; j++){
-				int tmp = mult(A[j][i], B[j], N);
-                R = R + tmp;   
-		      }
+				for(int j = 0; j < N; j++){
+					int tmp = mult(A[j][i], B[j], N);
+                	R = R + tmp;   
+		      	}
 		      printf("child: C[%d]=%d \t",i, R);
 		      R = 0;
             }
 	      }
 	  exit((int8_t)R);
     }
-  for(int i = 0; i < N; i++) {
+	for(int i = 0; i < N; i++) {
       pid[i] = waitpid(pid[i], &status, 0);
       M[i] = WEXITSTATUS(status);
-  }
+	}
 	return 0;
 }
 
@@ -69,7 +69,6 @@ void arrInit(int *** arr, int dim) {
     arrTmp[i] = calloc(dim, sizeof(int));
     if (!arrTmp[i]) return; 
   }
-
   *arr = arrTmp;  
 }
 void VecInit(int * Vec, int dim) {
@@ -121,27 +120,29 @@ int main(int argc, char** argv) {
 
   scanf("%d", &N);
   if (N <= 0) return -1;
-  	B = calloc(N, sizeof(int*));
+	B = calloc(N, sizeof(int*));
 	M = calloc(N, sizeof(int*));
 
-  arrInit(&A, N);
+	arrInit(&A, N);
 
 	arrFill(A,N);
 	VecFill(B,N);
 
-  printf("Arr A:\n");
-  arrPrint(A, N);
+ 
+	printf("Arr A:\n");
+	arrPrint(A, N);
 
-  printf("Arr B:\n");
-  VecPrint(B, N);
+  
+	printf("Arr B:\n");
+	VecPrint(B, N);
 
 	doit(A, B, M, N);
-
-  printf("Arr M = A x B =\n");
+	
+	printf("Arr M = A x B =\n");
 	VecPrint(M, N);
 
-  arrFree(A, N);
+	arrFree(A, N);
 	free(B);
 	free(M);
-  return 0;
+	return 0;
 }
