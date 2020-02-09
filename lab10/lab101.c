@@ -10,8 +10,6 @@
 #include <pthread.h>
 void *MultMatrix(void*);
 
-#define MAX_SEND_SIZE 80
-
 
 struct DATA {
     int *MainMatrix;
