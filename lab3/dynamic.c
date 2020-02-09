@@ -7,7 +7,7 @@ struct str{
 	int year;
 	int price;
 	int number;
-	};
+};
 int compare(const struct str **a, const struct str **b){
 	return (*a)->price - (*b)->price;
 }
