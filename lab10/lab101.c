@@ -10,8 +10,7 @@
 #include <pthread.h>
 void *MultMatrix(void*);
 
-
-struct DATA {
+struct data {
     int *MainMatrix;
     int *SubMatrix;
     int Number;
@@ -20,28 +19,25 @@ struct DATA {
 void arrInit(int *** arr, int dim);
 void arrFree(int ** arr, int dim);
 
-
-int mult(int A, int B, int N) {
+int mult(int A, int B) {
     int res = 0;
-    	res += A * B;
-    	return res;
+    res += A * B;
+    return res;
 }
 
 void arrFill(int **A, int N) {
-    for(int i = 0; i < N; i++) {
-        for(int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
             A[i][j] = 1 + rand() % 5;
         }
     }
 }
+
 void vecFill(int *B, int N) {
-    for(int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
             B[i] = 1 + rand() % 5;
     }
 }
-
-
-
 
 void arrInit(int *** arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
@@ -52,7 +48,6 @@ void arrInit(int *** arr, int dim) {
         arrTmp[i] = calloc(dim, sizeof(int));
         if (!arrTmp[i]) return; 
     }
-
   *arr = arrTmp;  
 }
 
@@ -89,7 +84,6 @@ void arrPrint(int ** arr, int dim) {
   printf("\n");
 }
 
-
 void vecPrint(int *arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
@@ -106,7 +100,7 @@ int main(int argc, char** argv) {
     if (N <= 0) return -1;
     int R[N];
     int res = 0;
-    struct DATA info;
+    struct data info;
     pthread_t lines[N];
 
 
@@ -132,26 +126,26 @@ int main(int argc, char** argv) {
     vecPrint(B, N);
 
 // пишем в структуру
-for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++){
+for (int i = 0; i < N; i++){
+	for (int j = 0; j < N; j++){
 // грязный костыль для ввода построчно
-			info.SubMatrix[j] = B[j];
+		info.SubMatrix[j] = B[j];
         	info.Number = N;
-			info.MainMatrix[j] = A[j][i];
-		}
+		info.MainMatrix[j] = A[j][i];
+	}
 // вы мутехи, да? Если мутехи, то идите найух:)
         pthread_mutex_lock(&mutex);
-        if(pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
+        if (pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
         	perror("Cant create");
         	return EXIT_FAILURE;
-        }else{
+        } else {
             pthread_mutex_unlock(&mutex);
         }
-        if((pthread_join(lines[i],(void**) &R)) != 0){
+        if ((pthread_join(lines[i],(void**) &R)) != 0){
             perror("Cant join");
             return EXIT_FAILURE;
-        }else{
-    printf("%i\n", (int) *R);
+        } else {
+    	printf("%i\n", (int) *R);
         }
 }
 
@@ -169,10 +163,10 @@ for(int i = 0; i < N; i++){
 
     void *MultMatrix(void *arg){
     int Z = 0;
-    struct DATA* info = (struct DATA*) arg;
-        for(int i = 0; i < info->Number; i++){
-            int tmp = mult(info->MainMatrix[i], info->SubMatrix[i],info->Number);
-            Z = Z + tmp;
+    struct data* info = (struct data*) arg;
+    for (int i = 0; i < info->Number; i++){
+    	int tmp = mult(info->MainMatrix[i], info->SubMatrix[i],info->Number);
+        Z = Z + tmp;
     }
     pthread_exit((void*) Z);
     }
