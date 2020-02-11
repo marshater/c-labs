@@ -137,20 +137,18 @@ for (int i = 0; i < N; i++){
         pthread_mutex_lock(&mutex);
         if (pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
         	perror("Cant create");
-        	return EXIT_FAILURE;
+        return EXIT_FAILURE;
         } else {
             pthread_mutex_unlock(&mutex);
         }
         if ((pthread_join(lines[i],(void**) &R)) != 0){
             perror("Cant join");
-			pthread_mutex_destroy(&mutex);
+	   		pthread_mutex_destroy(&mutex);
             return EXIT_FAILURE;
         } else {
     	printf("%i\n", (int) *R);
         }
 }
-
-
 
     pthread_mutex_destroy(&mutex);
 
