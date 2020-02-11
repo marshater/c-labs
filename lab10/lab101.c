@@ -103,10 +103,8 @@ int main(int argc, char** argv) {
     struct data info;
     pthread_t lines[N];
 
-
     pthread_mutex_t mutex;
     pthread_mutex_init(&mutex, NULL);
-
 
     arrInit(&A, N);
     vecInit(&info.MainMatrix, N);
@@ -114,10 +112,8 @@ int main(int argc, char** argv) {
     vecInit(&B, N);
     vecInit(&info.SubMatrix, N);
 
-
     arrFill(A,N);
     vecFill(B,N);
-
 
     printf("Arr A:\n");
     arrPrint(A, N);
