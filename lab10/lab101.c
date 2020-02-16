@@ -20,9 +20,7 @@ void arrInit(int *** arr, int dim);
 void arrFree(int ** arr, int dim);
 
 int mult(int A, int B) {
-    int res = 0;
-    res += A * B;
-    return res;
+    return A*B;
 }
 
 void arrFill(int **A, int N) {
