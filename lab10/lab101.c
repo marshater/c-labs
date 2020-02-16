@@ -124,7 +124,7 @@ for (int i = 0; i < N; i++){
 	for (int j = 0; j < N; j++){
 // грязный костыль для ввода построчно
 		info.SubMatrix[j] = B[j];
-        info.Number = N;
+		info.Number = N;
 		info.MainMatrix[j] = A[j][i];
 	}
 // вы мутехи, да? Если мутехи, то идите найух:)
@@ -137,7 +137,7 @@ for (int i = 0; i < N; i++){
         }
         if ((pthread_join(lines[i],(void**) &R)) != 0){
             perror("Cant join");
-	   		pthread_mutex_destroy(&mutex);
+			pthread_mutex_destroy(&mutex);
             return EXIT_FAILURE;
         } else {
     	printf("%i\n", (int) *R);
