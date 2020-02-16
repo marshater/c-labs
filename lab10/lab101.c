@@ -127,7 +127,7 @@ for (int i = 0; i < N; i++){
 		info.Number = N;
 		info.MainMatrix[j] = A[j][i];
 	}
-// вы мутехи, да? Если мутехи, то идите найух:)
+// вы мутехи, да?
         pthread_mutex_lock(&mutex);
         if (pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
         	perror("Cant create");
