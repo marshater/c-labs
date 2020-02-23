@@ -149,7 +149,6 @@ int main(int argc, char** argv) {
             info.MainMatrix[j] = A[j][i];
         }
 //
-        sock_listen = accept(sock_serv, (struct sockaddr *) &cl_addr, &cl_len);
         send(sock_listen, &info, sizeof(struct data),0);
         pthread_create(&tid[i], NULL, *serv, (void*) &sock_listen);
         i++;
