@@ -11,10 +11,22 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 void *MultMatrix(void*);
 void *serv(void*);
 void *calculation(void*);
+
+int mult(int A, int B) {
+    return A*B;
+}
+
+void DieWithError(char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
+}
 
 struct data {
     int *MainMatrix;
@@ -28,41 +40,56 @@ struct result {
 };
 
 int main(int argc, char** argv) {
-    struct result resu;
+
     int port,result;
     char *servIP;
+    int N=3;
+    int *addrlen;
+
+//
+    struct sockaddr_in serv_addr, cli_addr;
+    port = atoi(argv[1]);
 
 
 //
-    struct sockaddr_in serv_addr;
-    servIP = argv[1];
-    port = atoi(argv[2]);
-
-//
-    pthread_mutex_t mutex;
-    pthread_mutex_init(&mutex, NULL);
 
 
-    int cli_sock[N];
+
+    int cli_sock;
     pthread_t tid[N];
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr(servIP);
-    serv_addr.sin_port = htons(port);
+        cli_addr.sin_family = AF_INET;
+        cli_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        cli_addr.sin_port = htons(port);
 
 
 
-    for(int i = 0; i < N; i++){
-        struct data buf;
-        cli_sock[i] = socket(AF_INET, SOCK_DGRAM, 0);
-        connect(cli_sock[i], (struct sockaddr*) &serv_addr, sizeof(serv_addr));
-        resu.sock = cli_sock[i];
-        recv(cli_sock[i], &buf, sizeof(struct data),0);
-        pthread_create(&tid[i], NULL, calculation,(void*) &buf);
+
+
+    struct data buf;
+
+    int len = sizeof(serv_addr);
+
+        if ((cli_sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1){
+            DieWithError("Cant socket");
+        }
+
+        if(bind(cli_sock, (struct sockaddr *) &cli_addr, sizeof(cli_addr)) == -1){
+            DieWithError("Cant bind");
+            close(cli_sock);
+        }
+
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(25000);
+        if(inet_aton(argv[2], &serv_addr.sin_addr) == 0){
+            DieWithError("WRITE SERV, B***T!");
+        }
+        recvfrom(cli_sock, &buf, sizeof(struct data),0,(struct sockaddr*) NULL, 0 );
+        pthread_create(tid, NULL, calculation,(void*) &buf);
+        printf("TEST");
         int code;
-        pthread_join(tid[i], (void*) &code);
-        send(cli_sock[i], &result, sizeof(int), 0);
-        close(cli_sock[i]);
-    }
+        pthread_join(*tid, (void*) &code);
+        sendto(cli_sock, &result, sizeof(int), 0,(struct sockaddr*) &serv_addr, sizeof(&serv_addr) );
+        close(cli_sock);
     return 0;
 }
 
