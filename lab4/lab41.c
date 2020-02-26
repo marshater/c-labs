@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
 void removing(FILE *fp, FILE *stream, int num)
 {
 	char ch;
