@@ -4,63 +4,50 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
-#include <stdint.h>
-#include <fcntl.h>
-#include <string.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
+#include <arpa/inet.h>
 
-void *MultMatrix(void*);
-void *serv(void*);
+#include <data.h>
 
-struct data {
-    int *MainMatrix;
-    int *SubMatrix;
-    int Number;
-};
-
-void arrInit(int *** arr, int dim);
-void arrFree(int ** arr, int dim);
-
-int mult(int A, int B) {
-    return A*B;
-}
-
-void DieWithError(char *errorMessage)
+void dieWithError(char *errorMessage)
 {
     perror(errorMessage);
     exit(1);
 }
 
-void arrFill(int **A, int N) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+void arrFill(int **A, int N)
+{
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
             A[i][j] = 1 + rand() % 5;
-        }
     }
 }
 
-void vecFill(int *B, int N) {
-    for (int i = 0; i < N; i++) {
-            B[i] = 1 + rand() % 5;
-    }
+void vecFill(int *B, int N)
+{
+    for (int i = 0; i < N; i++)
+        B[i] = 1 + rand() % 5;
 }
 
-void arrInit(int *** arr, int dim) {
+void arrInit(int *** arr, int dim)
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
     int ** arrTmp = calloc(dim, sizeof(int*));
     if (!arrTmp) return;
-    for (int i = 0; i < dim; ++i) {
+    for (int i = 0; i < dim; ++i)
+    {
         arrTmp[i] = calloc(dim, sizeof(int));
         if (!arrTmp[i]) return; 
     }
-  *arr = arrTmp;  
+  *arr = arrTmp;
 }
 
-void vecInit(int **vec, int dim) {
+void vecInit(int ** vec, int dim)
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!vec) return;
     int *vecTmp = calloc(dim, sizeof(int*));
@@ -71,7 +58,8 @@ void vecInit(int **vec, int dim) {
 void arrFree(int ** arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
-    for (int i = 0; i < dim; ++i) free(arr[i]);
+    for (int i = 0; i < dim; ++i)
+        free(arr[i]);
     free(arr); 
 }
 
@@ -84,102 +72,128 @@ void vecFree(int * arr, int dim) {
 void arrPrint(int ** arr, int dim) {
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
-        for (int i = 0; i < dim; ++i) {
-            for (int j = 0; j < dim; ++j) {
+    for (int i = 0; i < dim; ++i)
+    {
+        for (int j = 0; j < dim; ++j)
+        {
             printf("%2d ", arr[i][j]);
         }
         printf("\n"); 
     }
-  printf("\n");
+    printf("\n");
 }
 
-void vecPrint(int *arr, int dim) {
+void vecPrint(int *arr, int dim)
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
-    for (int i = 0; i < dim; i++){
+    for (int i = 0; i < dim; i++)
+    {
         printf("%i", arr[i]);
         printf("\n");
     }
 }
 
-int main(int argc, char** argv) {
-    int **A, *B, N;
+// usage: server <client ip addr> <client port> <server ip> <server port> <matrix size>
+
+int main(int argc, char ** argv)
+{
+    if (6 != argc)
+    {
+        printf("usage: ./server <client ip addr> <client port> <server ip> <server port> <matrix size>\n");
+        return -1;
+    }
+
+    int N = atoi(argv[5]);
+    if (N < 1 || N > MAX_SIZE)
+    {
+        printf("invalid matrix size\n");
+        return -1;
+    }
+
+    char * server_ip = argv[3];
+    char * client_ip = argv[1];
+    int server_port = atoi(argv[4]);
+    int client_port = atoi(argv[2]);
+
+    struct sockaddr_in server_addr = {0};
+    struct sockaddr_in client_addr = {0};
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr(server_ip);
+    server_addr.sin_port = htons(server_port);
+
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_addr.s_addr = inet_addr(client_ip);
+    client_addr.sin_port = htons(client_port); 
+
+    int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sockfd < 0)
+    {
+        dieWithError("Cant socket");
+    };
+
+    int rc = bind(sockfd, (struct sockaddr*) &server_addr, sizeof(server_addr));
+    if (rc == -1)
+    {
+        dieWithError("Cant bind");
+        close(sockfd);
+    }
+
     srand(time(NULL));
-    N = atoi(argv[1]);
-    if (N <= 0) return -1;
-    int result = 0;
-    struct data info;
-//
-    struct sockaddr_in serv_addr, cl_addr;
-    int port, sock_serv, cl_len;
-    port = atoi(argv[2]);
-//    pthread_t tid[5];
 
-//
-
-
-
+    int **A;
     arrInit(&A, N);
-    vecInit(&info.MainMatrix, N);
-    
-    vecInit(&B, N);
-    vecInit(&info.SubMatrix, N);
+    arrFill(A, N);
 
-    arrFill(A,N);
-    vecFill(B,N);
+    int *B;
+    vecInit(&B, N);
+    vecFill(B, N);
+
 
     printf("Arr A:\n");
     arrPrint(A, N);
 
     printf("Arr B:\n");
     vecPrint(B, N);
-    printf("TEST");
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    serv_addr.sin_port = htons(25000);
-    bzero(&serv_addr, sizeof(serv_addr));
+    int result = 0;
+    struct data info;
+    socklen_t cl_len;
 
-    if((sock_serv = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0){
-        DieWithError("Cant socket");
-    };
-
-    if(bind(sock_serv, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == -1){
-        DieWithError("Cant bind");
-        close(sock_serv);
-    }
-
-
-    for(int i = 0; i < N; i++){
-        for (int j = 0; j < N; j++){
+    for(int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
             info.SubMatrix[j] = B[j];
             info.Number = N;
             info.MainMatrix[j] = A[j][i];
         }
-        sendto(sock_serv, &info, sizeof(struct data),0, (struct sockaddr*) &cl_addr, cl_len);
-        sleep(2);
-        recvfrom(sock_serv, &result, sizeof(int),0, (struct sockaddr*) &cl_addr, &cl_len );
-/*        pthread_create(&tid[i], NULL, *serv, (void*) &sock_serv);
-        pthread_join(tid[i], (void**) res);*/
-        i++;
-    }
-    
-    close(sock_serv);
 
+        rc = sendto(sockfd, &info, sizeof(struct data), 0, (struct sockaddr*) &client_addr, sizeof(struct sockaddr_in));
+        if (rc == -1)
+        {
+            arrFree(A, N);
+            vecFree(B, N);
+            close(sockfd);
+            dieWithError("sendto() failed");
+        }
+
+        rc = recvfrom(sockfd, &result, sizeof(int),0, (struct sockaddr*) &client_addr, &cl_len);
+        if (rc == -1)
+        {
+            arrFree(A, N);
+            vecFree(B, N);
+            close(sockfd);
+            dieWithError("sendto() failed");
+        }
+
+        fprintf(stderr, "result=%d\n", result);
+    }
+
+    close(sockfd);
     arrFree(A, N);
     vecFree(B, N);
-    vecFree(info.MainMatrix,N);
-    vecFree(info.SubMatrix, N);
 
     return 0;
 }
-
-/*
-void *serv(void *arg){
-    int sock = *(int*)arg;
-    {
-        recvfrom(sock, &result, sizeof(int),0, (struct sockaddr*) &cl_addr, &cl_len );
-        printf("%d\n", result);
-        pthread_exit((void*)result);
-    }
-}*/
