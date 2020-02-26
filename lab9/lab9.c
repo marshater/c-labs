@@ -233,7 +233,7 @@ int main(int argc, char** argv)
 	vecFree(B, N);
 
 
-	 if (shmctl(shid, IPC_RMID, 0) < 0) 
+	if (shmctl(shid, IPC_RMID, 0) < 0) 
 	{
 		perror("shmem deleting failure\n");
 		exit(1);
