@@ -35,7 +35,8 @@ int main(int argc, char **argv)
 			printf("<%s> %d: calloc failed\n", __FUNCTION__, __LINE__);
 			return -1;
 			}
-			if (NULL == buff_array[i]){
+			if (NULL == buff_array[i])
+			{
 				printf("<%s> %d: calloc failed\n", __FUNCTION__, __LINE__);
 				return -1;
 			}
@@ -43,14 +44,16 @@ int main(int argc, char **argv)
 		strcpy(buff_array[i],string_array[i]);
 	}
 	
-	int sorting(const void * x, const void * y){
+	int sorting(const void * x, const void * y)
+	{
 		return **((char**)y)-**((char **)x);
 	}
 	
 	qsort(string_array, num_lines, sizeof(char *), sorting);
 	
 	printf("sorted:\n");
-	for (int i = 0; i<num_lines; i++){
+	for (int i = 0; i<num_lines; i++)
+	{
 		puts(string_array[i]);
 	}
 
@@ -67,11 +70,13 @@ int main(int argc, char **argv)
 	}
 
 	printf("%d""\n",swap_num);
+	
 	for (int i = 0; i < num_lines; i++)
 	{
 		free(string_array[i]);
 		free(buff_array[i]);
 	}
+	
 	free(buff_array);
 	free(string_array);
 
