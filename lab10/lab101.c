@@ -19,21 +19,27 @@ struct data {
 void arrInit(int *** arr, int dim);
 void arrFree(int ** arr, int dim);
 
-int mult(int A, int B) {
+int mult(int A, int B) 
+{
     return A*B;
 }
 
-void arrFill(int **A, int N) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+void arrFill(int **A, int N) 
+{
+    for (int i = 0; i < N; i++) 
+    {
+        for (int j = 0; j < N; j++) 
+        {
             A[i][j] = 1 + rand() % 5;
         }
     }
 }
 
-void vecFill(int *B, int N) {
-    for (int i = 0; i < N; i++) {
-            B[i] = 1 + rand() % 5;
+void vecFill(int *B, int N) 
+{
+    for (int i = 0; i < N; i++) 
+    {
+        B[i] = 1 + rand() % 5;
     }
 }
 
@@ -42,14 +48,16 @@ void arrInit(int *** arr, int dim) {
     if (!arr) return;
     int ** arrTmp = calloc(dim, sizeof(int*));
     if (!arrTmp) return;
-    for (int i = 0; i < dim; ++i) {
+    for (int i = 0; i < dim; ++i) 
+    {
         arrTmp[i] = calloc(dim, sizeof(int));
         if (!arrTmp[i]) return; 
     }
-  *arr = arrTmp;  
+    *arr = arrTmp;  
 }
 
-void vecInit(int **vec, int dim) {
+void vecInit(int **vec, int dim) 
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!vec) return;
     int *vecTmp = calloc(dim, sizeof(int*));
@@ -57,24 +65,29 @@ void vecInit(int **vec, int dim) {
     *vec = vecTmp;
 }
 
-void arrFree(int ** arr, int dim) {
+void arrFree(int ** arr, int dim) 
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
     for (int i = 0; i < dim; ++i) free(arr[i]);
     free(arr); 
 }
 
-void vecFree(int * arr, int dim) {
+void vecFree(int * arr, int dim) 
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
     free(arr); 
 }
 
-void arrPrint(int ** arr, int dim) {
+void arrPrint(int ** arr, int dim) 
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
-        for (int i = 0; i < dim; ++i) {
-            for (int j = 0; j < dim; ++j) {
+        for (int i = 0; i < dim; ++i) 
+        {
+            for (int j = 0; j < dim; ++j) 
+            {
             printf("%2d ", arr[i][j]);
         }
         printf("\n"); 
@@ -82,22 +95,29 @@ void arrPrint(int ** arr, int dim) {
   printf("\n");
 }
 
-void vecPrint(int *arr, int dim) {
+void vecPrint(int *arr, int dim) 
+{
     fprintf(stderr, "dbg: %s\n", __func__);
     if (!arr) return;
-    for (int i = 0; i < dim; i++){
+    for (int i = 0; i < dim; i++)
+    {
         printf("%i", arr[i]);
         printf("\n");
     }
 }
 
-int main(int argc, char** argv) {
-    int **A, *B, N;
+int main(int argc, char** argv) 
+{
+    int **A;
+    int *B;
+    int N;
+
     srand(time(NULL));
     scanf("%d", &N);
     if (N <= 0) return -1;
     int R[N];
     int res = 0;
+
     struct data info;
     pthread_t lines[N];
 
@@ -119,29 +139,35 @@ int main(int argc, char** argv) {
     printf("Arr B:\n");
     vecPrint(B, N);
 
-// пишем в структуру
-for (int i = 0; i < N; i++){
-	for (int j = 0; j < N; j++){
-// грязный костыль для ввода построчно
+
+for (int i = 0; i < N; i++)
+{
+	for (int j = 0; j < N; j++)
+    {
 		info.SubMatrix[j] = B[j];
 		info.Number = N;
 		info.MainMatrix[j] = A[j][i];
 	}
-// вы мутехи, да?
-        pthread_mutex_lock(&mutex);
-        if (pthread_create(&lines[i], NULL, MultMatrix, &info) != 0){
-        	perror("Cant create");
+    pthread_mutex_lock(&mutex);
+
+    if (pthread_create(&lines[i], NULL, MultMatrix, &info) != 0)
+    {
+        perror("Cant create");
         return EXIT_FAILURE;
-        } else {
-            pthread_mutex_unlock(&mutex);
-        }
-        if ((pthread_join(lines[i],(void**) &R)) != 0){
-            perror("Cant join");
-			pthread_mutex_destroy(&mutex);
-            return EXIT_FAILURE;
-        } else {
-    	printf("%i\n", (int) *R);
-        }
+    } else 
+    {
+        pthread_mutex_unlock(&mutex);
+    }
+    
+    if ((pthread_join(lines[i],(void**) &R)) != 0)
+    {
+        perror("Cant join");
+		pthread_mutex_destroy(&mutex);
+        return EXIT_FAILURE;
+    } else 
+    {
+    printf("%i\n", (int) *R);
+    }
 }
 
     pthread_mutex_destroy(&mutex);
@@ -154,12 +180,14 @@ for (int i = 0; i < N; i++){
     return 0;
 }
 
-void *MultMatrix(void *arg){
+void *MultMatrix(void *arg)
+{
     int Z = 0;
     struct data* info = (struct data*) arg;
-    for (int i = 0; i < info->Number; i++){
+    for (int i = 0; i < info->Number; i++)
+    {
     	int tmp = mult(info->MainMatrix[i], info->SubMatrix[i],info->Number);
         Z = Z + tmp;
     }
     pthread_exit((void*) Z);
-    }
+}
