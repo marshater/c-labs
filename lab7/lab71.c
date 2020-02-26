@@ -11,46 +11,59 @@ void arrInit(int ***arr, int dim);
 void arrFree(int **arr, int dim);
 
 
-int mult(int A, int B, int N) {
-	int res = 0;
-	res += A * B;
-	return res;
+int mult(int A, int B) 
+{
+	return A*B;
 }
 
 
-void arrFill(int **A, int N) {
-	for(int i = 0; i < N; i++) {
-		for(int j = 0; j < N; j++) {
+void arrFill(int **A, int N) 
+{
+	for(int i = 0; i < N; i++) 
+	{
+		for(int j = 0; j < N; j++) 
+		{
 			A[i][j] = 1 + rand() % 5;
 		}
 	}
 }
 
-void vecFill(int *B, int N) {
-	for(int i = 0; i < N; i++) {
+void vecFill(int *B, int N) 
+{
+	for(int i = 0; i < N; i++) 
+	{
 			B[i] = 1 + rand() % 5;
 	}
 }
 
-int doit(int **A, int *B, int *M, int N) {
+int doit(int **A, int *B, int *M, int N) 
+{
     int status;
     int R = 0;
     pid_t pid[N];
     int fd[N][2];
-    	for (int i = 0; i < N; i++){
-    		if (pipe(fd[i]) ==  -1){
+    	for (int i = 0; i < N; i++)
+		{
+    		if (pipe(fd[i]) ==  -1)
+			{
 				printf("error: cannot create pipe");
 				exit(1);
 			}
     	}
-    for (int i = 0; i < N; i++) {
+	
+    for (int i = 0; i < N; i++) 
+	{
         pid[i] = fork();
-        if (pid < 0) {
+        if (pid < 0) 
+		{
         	printf("fork() failed\n");
         	exit(-1);
-        } else if (pid[i] == 0) {
-	    	for(int i = 0; i < N; i++){
-	    		for(int j = 0; j < N; j++){
+        } else if (pid[i] == 0) 
+		{
+	    	for(int i = 0; i < N; i++)
+			{
+	    		for(int j = 0; j < N; j++)
+				{
 	        		int tmp = mult(A[j][i], B[j], N);
                 	R = R + tmp;   
 	        	}
@@ -61,31 +74,37 @@ int doit(int **A, int *B, int *M, int N) {
 		}
 		exit(0);
 	}
-	for(int i = 0; i < N; i++) {
+	
+	for(int i = 0; i < N; i++) 
+	{
 		int buf;
     		pid[i] = waitpid(pid[i], &status, 0);
 		*M = read(fd[i][0], &buf, sizeof(int));
 	}
-	for(int i = 0; i < N; i++){
+	for(int i = 0; i < N; i++)
+	{
 		close(fd[i][0]);
 		close(fd[i][1]);
 	}
 	return *M;
 }
 
-void arrInit(int ***arr, int dim) {
+void arrInit(int ***arr, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	int ** arrTmp = calloc(dim, sizeof(int*));
 	if (!arrTmp) return;
-	for (int i = 0; i < dim; ++i) {
+	for (int i = 0; i < dim; ++i) 
+	{
 		arrTmp[i] = calloc(dim, sizeof(int));
 		if (!arrTmp[i]) return; 
 	}
 	*arr = arrTmp;  
 }
 
-void vecInit(int **vec, int dim) {
+void vecInit(int **vec, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!vec) return;
 	int *vecTmp = calloc(dim, sizeof(int*));
@@ -93,24 +112,29 @@ void vecInit(int **vec, int dim) {
 	*vec = vecTmp;
 }
 
-void arrFree(int **arr, int dim) {
+void arrFree(int **arr, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	for (int i = 0; i < dim; ++i) free(arr[i]);
 	free(arr); 
 }
 
-void vecFree(int *arr, int dim) {
+void vecFree(int *arr, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
 	free(arr); 
 }
 
-void arrPrint(int **arr, int dim) {
+void arrPrint(int **arr, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
-	for (int i = 0; i < dim; ++i) {
-    	for (int j = 0; j < dim; ++j) {
+	for (int i = 0; i < dim; ++i) 
+	{
+    	for (int j = 0; j < dim; ++j) 
+		{
     		printf("%2d ", arr[i][j]);
     	}
     	printf("\n"); 
@@ -119,16 +143,19 @@ void arrPrint(int **arr, int dim) {
 }
 
 
-void vecPrint(int *arr, int dim) {
+void vecPrint(int *arr, int dim) 
+{
 	fprintf(stderr, "dbg: %s\n", __func__);
 	if (!arr) return;
-	for (int i = 0; i < dim; i++) {
+	for (int i = 0; i < dim; i++) 
+	{
 		printf("%i", arr[i]);
 		printf("\n");
 	}
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) 
+{
 	int **A, *B, *M, N, out;
 	srand(time(NULL));
 	scanf("%d", &N);
