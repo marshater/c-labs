@@ -1,0 +1,10 @@
+doit: lab51.o math2.so
+	gcc -o dynamic lab51.o -L. -lmath2 -Wl,-rpath,.
+main: lab51.c
+	gcc -c lab51.c
+dyn: math.o
+	gcc -shared -o libmath2.so math.o
+math: math.c
+	gcc -c -fPIC math.c
+clean:
+	rm -f *.o *.so dynamic
